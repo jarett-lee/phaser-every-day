@@ -23,6 +23,20 @@ const config = {
                     "css-loader",
                 ],
             },
+            {
+                test: /\.html$/,
+                use: [
+                    {
+                        loader: "file-loader?name=[name].[ext]",
+                        options: {
+                            name: "[path][name].[ext]",
+                            context: "src",
+                        },
+                    },
+                    "extract-loader",
+                    "html-loader",
+                ],
+            },
         ],
     },
     plugins: [new CleanWebpackPlugin()],
