@@ -4,7 +4,10 @@
 const path = require("path");
 
 const config = {
-    entry: "./src/js/index.ts",
+    entry: {
+        "tic-tac-toe": "./src/projects/tic-tac-toe/scripts/index.ts",
+        "unknown-second-project": "./src/projects/unknown-second-project/scripts/index.ts",
+    },
     module: {
         rules: [
             {
@@ -28,10 +31,11 @@ const config = {
         ],
     },
     output: {
-        filename: "bundle.js",
+        filename: "[name].bundle.js",
         path: path.resolve(
             __dirname,
             "dist",
+            "scripts",
         ),
     },
 };
