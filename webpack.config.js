@@ -3,6 +3,7 @@
 /* global __dirname */
 const path = require("path");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
+const CopyPlugin = require("copy-webpack-plugin");
 
 const config = {
     entry: {
@@ -39,7 +40,10 @@ const config = {
             },
         ],
     },
-    plugins: [new CleanWebpackPlugin()],
+    plugins: [
+        new CleanWebpackPlugin(),
+        new CopyPlugin(["src/index.html"]),
+    ],
     resolve: {
         extensions: [
             ".ts",
@@ -51,7 +55,6 @@ const config = {
         path: path.resolve(
             __dirname,
             "dist",
-            "scripts",
         ),
     },
 };
@@ -59,7 +62,10 @@ const config = {
 module.exports = (env, argv) => {
     if (argv.mode === "development") {
         config.devtool = "source-map";
-        config.devServer = {contentBase: "./dist"};
+        config.devServer = {
+            contentBase: "./dist",
+            writeToDisk: true,
+        };
     }
 
     return config;
