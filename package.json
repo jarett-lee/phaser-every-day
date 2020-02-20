@@ -5,10 +5,8 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run copy-html && npm run server",
-    "copy-html": "mkdir -p dist && cp src/index.html dist/",
     "server": "webpack-dev-server --mode=\"development\" --open",
-    "build": "npm run clean && npm run copy-html && webpack --mode=\"production\"",
+    "build": "webpack --mode=\"production\"",
     "clean": "rm -r dist || exit 0"
   },
   "repository": {
@@ -25,6 +23,7 @@
     "@types/webpack-dev-server": "^3.10.0",
     "@typescript-eslint/eslint-plugin": "^2.19.0",
     "@typescript-eslint/parser": "^2.19.0",
+    "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
     "eslint-plugin-import": "^2.20.1",
