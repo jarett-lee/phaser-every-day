@@ -66,6 +66,10 @@ module.exports = (env, argv) => {
             contentBase: "./dist",
             writeToDisk: true,
         };
+        config.output.path = path.resolve(
+            __dirname,
+            "dist",
+        );
     }
 
     return config;
