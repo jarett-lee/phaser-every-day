@@ -54,7 +54,7 @@ const config = {
         filename: "[name].bundle.js",
         path: path.resolve(
             __dirname,
-            "dist",
+            "docs",
         ),
     },
 };
