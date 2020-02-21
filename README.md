@@ -4,6 +4,9 @@ I want to see if I enjoy making and publishing games, so I want to work on it ev
 
 I have some self-imposed rules. In this repo, I'll work solely towards the goal of publishing games. If I want to play around with a game concept that I'm not currently working on, then that goes somewhere else. Constantly evaluate your own choices and write them down in a daily journal. No hard goals. There's no way to fail, I have years. Just set a direction and move towards that direction.
 
+## Current status
+Want to see what I've done so far? Go to https://jarett-lee.github.io/phaser-every-day/ to see my projects and read my development blog.
+
 ## Development environment
 
 ### Get started
