@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* global __dirname */
 const path = require("path");
+const fs = require("fs");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
 
@@ -38,6 +39,21 @@ const config = {
                     "html-loader",
                 ],
             },
+            {
+                test: /\.md$/,
+                use: [
+                    {
+                        loader: "file-loader",
+                        options: {
+                            name: "[path][name].html",
+                            context: "src",
+                        },
+                    },
+                    "extract-loader",
+                    "html-loader",
+                    "markdown-loader",
+                ],
+            },
         ],
     },
     plugins: [
@@ -60,6 +76,14 @@ const config = {
 };
 
 module.exports = (env, argv) => {
+    const postsDir = path.join(__dirname, "src", "posts");
+    config.entry["posts"] = fs
+        .readdirSync(postsDir)
+        .filter(file => path.extname(file) === ".md")
+        .map(file => path.relative(__dirname, path.join(postsDir, file)))
+        // TODO find a nicer way to add the preceding dot
+        .map(file => "./" + file);
+
     if (argv.mode === "development") {
         config.devtool = "source-map";
         config.devServer = {
