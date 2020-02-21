@@ -28,7 +28,7 @@ const config = {
                 test: /\.html$/,
                 use: [
                     {
-                        loader: "file-loader?name=[name].[ext]",
+                        loader: "file-loader",
                         options: {
                             name: "[path][name].[ext]",
                             context: "src",
