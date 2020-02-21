@@ -1,0 +1,147 @@
+<h1 id="getting-starting">Getting starting</h1>
+<p>by Jarett Lee on 2020-02-20</p>
+<p>My backlog</p>
+<ul>
+<li>Tic-tac-toe phaser game</li>
+<li>Website</li>
+</ul>
+<p>My first target today is to get the website up so that I start journaling.</p>
+<ol start="0">
+<li>Make the game project template work for phaser-every-day</li>
+<li>Set up the git repo</li>
+</ol>
+<p>Difficulty</p>
+<h2 id="i-want-multiple-html-files-and-multiple-js-files-and-multiple-projects-how-do-i-organize-my-repo">I want multiple html files and multiple js files and multiple projects, how do I organize my repo?</h2>
+<h3 id="questions">Questions</h3>
+<h4 id="should-i-use-jekyll">Should I use Jekyll?</h4>
+<p>I&#39;ve set up complicated things with Jekyll before and I spent more time wrestling Jekyll than producing content, so I think &quot;simple&quot; folder structuring should work.</p>
+<h4 id="split-by-project-or-split-by-file-type">Split by project or split by file type?</h4>
+<p>I foresee files that are in the same project will frequently be edited at the same time, while I think I will rarely edit all the html files at the same time. So, I want the project files close to each other.</p>
+<h3 id="1-split-each-project-into-its-own-folder">1. Split each project into it&#39;s own folder</h3>
+<ul>
+<li>/src/index.html</li>
+<li>/src/posts/</li>
+<li>/src/posts/2020-02-19.html</li>
+<li>/src/projects/</li>
+<li>/src/projects/tic-tac-toe/</li>
+<li>/src/projects/tic-tac-toe/index.html</li>
+<li>/src/projects/tic-tac-toe/scripts/index.ts</li>
+<li>/src/projects/unknown-second-project/</li>
+<li>/src/projects/unknown-second-project/index.html</li>
+<li>/src/projects/unknown-second-project/scripts/index.ts</li>
+</ul>
+<h3 id="2-add-entry-points-for-each-index-file-in-webpack">2. Add entry points for each index file in webpack</h3>
+<p><a href="https://webpack.js.org/concepts/entry-points/">https://webpack.js.org/concepts/entry-points/</a></p>
+<pre><code class="language-js">module.exports = {
+    entry: {
+        &quot;tic-tac-toe&quot;: &#39;./src/project/tic-tac-toe/index.ts&#39;,
+        &quot;unknown-second-project&quot;: &#39;./src/project/unknown-second-project/index.ts&#39;,
+    },
+    output: {
+        filename: &quot;bundle.js&quot;,
+        path: path.resolve(
+            __dirname,
+            &quot;dist&quot;,
+            &quot;scripts&quot;,
+        ),
+    },
+};</code></pre>
+<p>This gave me the following error since now webpack is trying to write both the entry index files to bundle.js.</p>
+<pre><code>ERROR in chunk unknown-second-project [entry]
+bundle.js
+Conflict: Multiple chunks emit assets to the same filename bundle.js (chunks tic-tac-toe and unknown-second-project)</code></pre><h3 id="3-add-unique-output-points-for-bundles-in-webpack">3. Add unique output points for bundles in webpack</h3>
+<p>Add the special string &quot;[name]&quot; to the output filename. This will create the files <em>tic-tac-toe.bundle.js</em> and <em>unknown-second-project.bundle.js</em>.</p>
+<pre><code class="language-js">module.exports = {
+    entry: {
+        &quot;tic-tac-toe&quot;: &#39;./src/project/tic-tac-toe/index.ts&#39;,
+        &quot;unknown-second-project&quot;: &#39;./src/project/unknown-second-project/index.ts&#39;,
+    },
+    output: {
+        filename: &quot;[name].bundle.js&quot;,
+        path: path.resolve(
+            __dirname,
+            &quot;dist&quot;,
+        ),
+    },
+};</code></pre>
+<h3 id="4-load-html-files-to-same-path-in-dist">4. Load html files to same path in dist</h3>
+<p><a href="https://webpack.js.org/loaders/html-loader/#export-into-html-files">https://webpack.js.org/loaders/html-loader/#export-into-html-files</a></p>
+<pre><code class="language-bash">npm install --save-dev file-loader extract-loader html-loader</code></pre>
+<pre><code class="language-js">// webpack.config.js
+module.exports = {
+    module: {
+        rules: [
+            {
+                test: /\.html$/,
+                use: [
+                    {
+                        loader: &quot;file-loader?name=[name].[ext]&quot;,
+                        options: {
+                            name: &quot;[path][name].[ext]&quot;,
+                            context: &quot;src&quot;,
+                        },
+                    },
+                    &quot;extract-loader&quot;,
+                    &quot;html-loader&quot;,
+                ],
+            },
+        ],
+    },
+};</code></pre>
+<pre><code class="language-ts">// src/projects/tic-tac-toe/scripts/index.ts
+import &quot;../index.html&quot;;</code></pre>
+<p>This creates <em>dist/projects/tic-tac-toe/index.html</em> and <em>dist/projects/unknown-second-project/index.html</em>.</p>
+<h3 id="5-add-srcindexhtml-to-dist">5. Add src/index.html to dist</h3>
+<p><a href="https://github.com/webpack-contrib/copy-webpack-plugin">https://github.com/webpack-contrib/copy-webpack-plugin</a></p>
+<pre><code class="language-bash">npm install --save-dev copy-webpack-plugin</code></pre>
+<pre><code class="language-js">const CopyPlugin = require(&quot;copy-webpack-plugin&quot;);
+
+const config = {
+    plugins: [
+        new CleanWebpackPlugin(),
+        new CopyPlugin([&quot;src/index.html&quot;]),
+    ],
+};
+
+module.exports = (env, argv) =&gt; {
+    if (argv.mode === &quot;development&quot;) {
+        config.devtool = &quot;source-map&quot;;
+        config.devServer = {
+            contentBase: &quot;./dist&quot;,
+            writeToDisk: true,
+        };
+    }
+
+    return config;
+};</code></pre>
+<h3 id="to-be-continued">To be continued</h3>
+<ul>
+<li>Load the markdown post files /posts/2020-02-19.md</li>
+<li>Put the js bundles next to their corresponding project index.html file</li>
+<li>Point the index.html script src to the corresponding js bundle</li>
+<li>Maybe use the docs branch to post the compiled html</li>
+<li>Get github to host the pages</li>
+</ul>
+<h2 id="other-questions">Other questions</h2>
+<h3 id="am-i-going-to-have-a-journal-entry-for-every-file">Am I going to have a journal entry for every file?</h3>
+<p>I see right now that answering &quot;how do I organize my repo&quot; (I&#39;m on point 2 as of writing this question) is something that could take multiple days. Do I want to split these journal entries?</p>
+<p>For that matter, what&#39;s the point of these journal entries when my plan is to see if I enjoy &quot;making and publishing games&quot;?</p>
+<p>Actually, part of publishing a game is communicating with your players. Slay the Spire and Factorio, two popular indie games, are good at communicating their current progress. Slay the Spire through Reddit and Discord and Factorio through Reddit and blog posts. The goal of this journal could be to practice communicating.</p>
+<p>Alternatively, I could also write this journal with the goal of attracting attention from other game developers. I imagine that game developers have more relevant knowledge than the general public. I&#39;ll also be writing about technical topics, so game developers are a good audience match.</p>
+<p>Also, I always write for myself. What would I enjoy writing the most and what would I get the most out of reading? How-to tutorials, reasoning behind decisions, and emotions - pretty much what I&#39;m writing already.</p>
+<p>Back to the main question... I think I should do day-by-day journaling. I can foresee my future self struggling to organize the tutorials. A timeline has natural organization. As a side-effect, this guarantee a commit every day, will hopefully make an aesthetically pleasing Github timeline.</p>
+<h3 id="word-choice">Word choice?</h3>
+<p>These things don&#39;t matter much, but they bother me a lot. (This is also why I have a stupid .eslintrc.js file)</p>
+<ul>
+<li>/src/journal/ vs /src/journals/ vs /src/journal-entries/ vs /src/entries/ vs /src/posts/ = /src/posts/</li>
+<li>/src/project/ vs /src/projects/ = /src/projects/</li>
+<li>/src/project/tic-tac-toe/index.ts vs /src/project/tic-tac-toe/js/index.ts vs /src/project/tic-tac-toe/script/index.ts vs /src/project/tic-tac-toe/scripts/index.ts = /src/project/tic-tac-toe/scripts/index.ts<ul>
+<li>Need a folder for organization</li>
+</ul>
+</li>
+</ul>
+<h3 id="should-i-keep-my-posts-and-development-branches-separate">Should I keep my posts and development branches separate?</h3>
+<p>I would like if I could innately have my post and development branches separate. This is possible if I use two repos or two branches, but I really want the posts and code to be as close as possible. I can&#39;t think of a simple way to keep them separate in git but in the same folder, so I&#39;ll just keep them together.</p>
+<p>I&#39;ll start all the post commits with Post.</p>
+<h3 id="why-did-i-write-this-post-in-markdown">Why did I write this post in markdown?</h3>
+<p>I&#39;m a silly guy. I forgot that I wasn&#39;t using Jekyll. However, I am very comfortable writing in markdown and webpack has a markdown-loader, so I&#39;m going to keep using markdown.</p>
