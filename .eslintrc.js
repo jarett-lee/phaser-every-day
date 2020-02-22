@@ -74,7 +74,7 @@ module.exports = {
     "max-params": "warn",
     "max-statements": "warn",
     "max-statements-per-line": "warn",
-    "multiline-comment-style": "warn",
+    // "multiline-comment-style": "warn",
     "multiline-ternary": "warn",
     "new-cap": "warn",
     "new-parens": "warn",
