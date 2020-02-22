@@ -5,6 +5,7 @@ const path = require("path");
 const fs = require("fs");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
 const CopyPlugin = require("copy-webpack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const config = {
     entry: {
@@ -27,17 +28,7 @@ const config = {
             },
             {
                 test: /\.html$/,
-                use: [
-                    {
-                        loader: "file-loader",
-                        options: {
-                            name: "[path][name].[ext]",
-                            context: "src",
-                        },
-                    },
-                    "extract-loader",
-                    "html-loader",
-                ],
+                use: "html-loader",
             },
             {
                 test: /\.md$/,
@@ -59,6 +50,16 @@ const config = {
     plugins: [
         new CleanWebpackPlugin(),
         new CopyPlugin(["src/index.html"]),
+        new HtmlWebpackPlugin({
+            chunks: ["tic-tac-toe"],
+            filename: "projects/tic-tac-toe/index.html",
+            template: "src/projects/tic-tac-toe/index.html",
+        }),
+        new HtmlWebpackPlugin({
+            chunks: ["unknown-second-project"],
+            filename: "projects/unknown-second-project/index.html",
+            template: "src/projects/unknown-second-project/index.html",
+        }),
     ],
     resolve: {
         extensions: [
