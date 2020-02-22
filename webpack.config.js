@@ -8,10 +8,8 @@ const CopyPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const config = {
-    entry: {
-        "tic-tac-toe": "./src/projects/tic-tac-toe/scripts/index.ts",
-        "unknown-second-project": "./src/projects/unknown-second-project/scripts/index.ts",
-    },
+    // entries dynamically generated based on src/posts and src/projects
+    entry: {},
     module: {
         rules: [
             {
@@ -50,16 +48,6 @@ const config = {
     plugins: [
         new CleanWebpackPlugin(),
         new CopyPlugin(["src/index.html"]),
-        new HtmlWebpackPlugin({
-            chunks: ["tic-tac-toe"],
-            filename: "projects/tic-tac-toe/index.html",
-            template: "src/projects/tic-tac-toe/index.html",
-        }),
-        new HtmlWebpackPlugin({
-            chunks: ["unknown-second-project"],
-            filename: "projects/unknown-second-project/index.html",
-            template: "src/projects/unknown-second-project/index.html",
-        }),
     ],
     resolve: {
         extensions: [
@@ -76,14 +64,53 @@ const config = {
     },
 };
 
-module.exports = (env, argv) => {
+// TODO find a nicer way to add the preceding dot
+const addPrecedingDot = (file) => "./" + file;
+
+const addProjects = () => {
+    const projectsDir = path.join(__dirname, "src", "projects");
+
+    const projects = fs.readdirSync(projectsDir).map(file => ({
+        basename: file,
+        indexHtmlRelativePath: path.join("projects", file, "index.html"),
+        indexTsRelativePath: path.join("projects", file, "scripts", "index.ts"),
+        hasIndexHtml: fs.existsSync(path.join(projectsDir, file, "index.html")),
+        hasIndexTs: fs.existsSync(path.join(projectsDir, file, "scripts", "index.ts")),
+    }));
+
+    const projectsWithNoIndexHtml = projects.filter(project => !project.hasIndexHtml);
+    if (projectsWithNoIndexHtml.length > 0) {
+        console.warn(`Following projects have no index.html file: ${projectsWithNoIndexHtml}`);
+    }
+    const projectsWithNoIndexTs = projects.filter(project => !project.hasIndexTs);
+    if (projectsWithNoIndexTs.length > 0) {
+        console.warn(`Following projects have no scripts/index.ts file: ${projectsWithNoIndexTs}`);
+    }
+
+    const validProjects = projects.filter(project => project.hasIndexHtml && project.hasIndexHtml);
+
+    validProjects.forEach(project => {
+        config.entry[project.basename] = addPrecedingDot(path.join("src", project.indexTsRelativePath));
+        config.plugins.push(new HtmlWebpackPlugin({
+            chunks: [project.basename],
+            filename: project.indexHtmlRelativePath,
+            template: path.join("src", project.indexHtmlRelativePath),
+        }));
+    });
+};
+
+const addDevPosts = () => {
     const postsDir = path.join(__dirname, "src", "posts");
     config.entry["posts"] = fs
         .readdirSync(postsDir)
         .filter(file => path.extname(file) === ".md")
         .map(file => path.relative(__dirname, path.join(postsDir, file)))
-        // TODO find a nicer way to add the preceding dot
-        .map(file => "./" + file);
+        .map(addPrecedingDot);
+};
+
+module.exports = (env, argv) => {
+    addDevPosts();
+    addProjects();
 
     if (argv.mode === "development") {
         config.devtool = "source-map";
