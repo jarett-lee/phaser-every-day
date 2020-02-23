@@ -1,0 +1,71 @@
+<p>I got to drawing the tic tac toe board, adding interaction, and starting on the game state.</p>
+<h2 id="tic-tac-toe">Tic-tac-toe</h2>
+<p>Finally, I&#39;m at the point where I can start developing. (I really want to add unit tests right now as well, but I&#39;ll put that on hold.)</p>
+<p>I&#39;m starting with the draw functions so that I can visually debug the code.</p>
+<p>Search here to find phaser 3 examples: <a href="https://phaser.io/examples/v3/search?search=line">https://phaser.io/examples/v3/search?search=line</a></p>
+<p>This is pretty much all I needed for this: <a href="https://phaser.io/examples/v3/view/game-objects/graphics/line-thickness">https://phaser.io/examples/v3/view/game-objects/graphics/line-thickness</a></p>
+<pre><code class="language-js">function create () {
+    var graphics = this.add.graphics();
+
+    graphics.lineStyle(20, 0x2ECC40);
+
+    graphics.strokeRect(50, 50, 100, 40);
+
+    graphics.strokeCircle(600, 400, 64);
+
+    graphics.beginPath();
+
+    graphics.moveTo(400, 100);
+    graphics.lineTo(200, 278);
+    graphics.lineTo(340, 430);
+    graphics.lineTo(650, 80);
+
+    graphics.closePath();
+    graphics.strokePath();
+}
+</code></pre>
+<p>Next to add interaction. My intuitive thought is to add interaction via mouse. I considered using keyboard briefly, but on phones especially, tapping is the way to go.</p>
+<p>Here&#39;s the mouse down example: <a href="https://phaser.io/examples/v3/view/input/mouse/mouse-down#">https://phaser.io/examples/v3/view/input/mouse/mouse-down#</a></p>
+<pre><code class="language-js">function preload () {
+    this.load.image(&#39;logo&#39;, &#39;assets/sprites/phaser.png&#39;);
+}
+
+function create() {
+    this.input.on(&#39;pointerdown&#39;, function (pointer) {
+        console.log(&#39;down&#39;);
+        this.add.image(pointer.x, pointer.y, &#39;logo&#39;);
+    }, this);
+}
+</code></pre>
+<p>Now to handle board state. I&#39;m a fan of using a single array and having accessors.</p>
+<h2 id="minor-things">Minor things</h2>
+<h3 id="max-statements">max-statements</h3>
+<p><a href="https://eslint.org/docs/rules/max-statements">https://eslint.org/docs/rules/max-statements</a></p>
+<p>I like this rule, but it&#39;s too distracting. eslint highlights the whole function and it doesn&#39;t make it easy to figure out where the issue is.</p>
+<h3 id="make-webpack-resolve-from-project-root">Make webpack resolve from project root</h3>
+<p>I&#39;m planning on having a shared library, so I want to have an alias for the library. The simple step is to add an alias to webpack, but that&#39;s not it. I have to make eslint and vscode understand the alias as well.</p>
+<pre><code class="language-js">// webpack.config.js
+const config = {
+    resolve: {
+        alias: {
+            lib: path.resolve(__dirname, &quot;src/lib/&quot;),
+        },
+    },
+};</code></pre>
+<p><a href="https://www.npmjs.com/package/eslint-import-resolver-webpack">https://www.npmjs.com/package/eslint-import-resolver-webpack</a></p>
+<pre><code class="language-bash">npm install eslint-import-resolver-webpack --save-dev</code></pre>
+<pre><code class="language-js">// .eslintrc.js
+module.exports = {
+  &quot;import/resolver&quot;: &quot;webpack&quot;,
+}</code></pre>
+<p><a href="https://medium.com/@justintulk/solve-module-import-aliasing-for-webpack-jest-and-vscode-74007ce4adc9">https://medium.com/@justintulk/solve-module-import-aliasing-for-webpack-jest-and-vscode-74007ce4adc9</a></p>
+<p>tsconfig.json</p>
+<pre><code class="language-json">{
+  &quot;compilerOptions&quot;: {
+    &quot;baseUrl&quot;: &quot;./&quot;,                          /* Base directory to resolve non-absolute module names. */
+    &quot;paths&quot;: {                                /* A series of entries which re-map imports to lookup locations relative to the &#39;baseUrl&#39;. */
+      &quot;lib/*&quot;: [&quot;src/lib/*&quot;]
+    },
+  }
+}</code></pre>
+<p>In the future when I add jest, I&#39;ll also have to configure jest&#39;s moduleNameMapper.</p>
