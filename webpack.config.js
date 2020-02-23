@@ -50,6 +50,7 @@ const config = {
         new CopyPlugin(["src/index.html"]),
     ],
     resolve: {
+        alias: {lib: path.resolve(__dirname, "src/lib/")},
         extensions: [
             ".ts",
             ".js",

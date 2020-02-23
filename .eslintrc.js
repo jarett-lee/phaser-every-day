@@ -19,6 +19,7 @@ module.exports = {
       impliedStrict: true
     }
   },
+  "import/resolver": "webpack",
   env: {
     browser: true,
     commonjs: true
