@@ -64,10 +64,6 @@ const nextTurn = (turn: Turn): Turn => {
 class SimpleScene extends Phaser.Scene {
     turn: Turn = Turn.X;
 
-    preload(): void {
-        // TODO
-    }
-
     create(): void {
         const graphics = this.add.graphics();
         graphics.lineStyle(1, 0xFFFFFF);
@@ -84,10 +80,6 @@ class SimpleScene extends Phaser.Scene {
             }
             this.turn = nextTurn(this.turn);
         }, this);
-    }
-
-    update(): void {
-        // TODO
     }
 }
 
