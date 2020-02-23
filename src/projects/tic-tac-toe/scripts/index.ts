@@ -1,32 +1,66 @@
 import Phaser from "phaser";
 
+const drawO = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
+    graphics.beginPath();
+
+    const size = 100;
+    const radius = Math.floor(size / 2);
+
+    graphics.strokeCircle(centerX, centerY, radius);
+};
+
+const drawX = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
+    graphics.beginPath();
+
+    const size = 100;
+    const x = centerX - Math.floor(size / 2);
+    const y = centerY - Math.floor(size / 2);
+
+    graphics.moveTo(x, y);
+    graphics.lineTo(x + size, y + size);
+    graphics.moveTo(x, y + size);
+    graphics.lineTo(x + size, y);
+
+    graphics.strokePath();
+};
+
+const drawBoard = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
+    const size = 100;
+
+    const x = centerX - Math.floor(size / 2) - size;
+    const y = centerY - Math.floor(size / 2) - size;
+
+    graphics.moveTo(x, y + size);
+    graphics.lineTo(x + (3 * size), y + size);
+
+    graphics.moveTo(x, y + (2 * size));
+    graphics.lineTo(x + (3 * size), y + (2 * size));
+
+    graphics.moveTo(x + size, y);
+    graphics.lineTo(x + size, y + (3 * size));
+
+    graphics.moveTo(x + (2 * size), y);
+    graphics.lineTo(x + (2 * size), y + (3 * size));
+
+    graphics.strokePath();
+};
+
 class SimpleScene extends Phaser.Scene {
     preload(): void {
-        this.load.setBaseURL("http://labs.phaser.io");
-
-        this.load.image("sky", "assets/skies/space3.png");
-        this.load.image("logo", "assets/sprites/phaser3-logo.png");
-        this.load.image("red", "assets/particles/red.png");
+        // TODO
     }
 
     create(): void {
-        this.add.image(400, 300, "sky");
+        const graphics = this.add.graphics();
+        graphics.lineStyle(1, 0xFFFFFF);
 
-        const particles = this.add.particles("red");
+        drawX(graphics, 100, 100);
+        drawO(graphics, 200, 200);
+        drawBoard(graphics, 200, 200);
+    }
 
-        const emitter = particles.createEmitter({
-            speed: 100,
-            scale: {start: 1, end: 0},
-            blendMode: "ADD",
-        });
-
-        const logo = this.physics.add.image(400, 100, "logo");
-
-        logo.setVelocity(100, 200);
-        logo.setBounce(1, 1);
-        logo.setCollideWorldBounds(true);
-
-        emitter.startFollow(logo);
+    update(): void {
+        // TODO
     }
 }
 
@@ -38,10 +72,6 @@ class SimpleGame {
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            physics: {
-                default: "arcade",
-                arcade: {gravity: {y: 200}},
-            },
         };
 
         this.game = new Phaser.Game(config);
