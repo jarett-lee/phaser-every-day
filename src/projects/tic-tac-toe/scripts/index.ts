@@ -49,20 +49,63 @@ const snapToBoard = (x: number, y: number): {x: number; y: number} => {
     };
 };
 
-enum Turn {
+enum Piece {
     X, O
 }
 
-const nextTurn = (turn: Turn): Turn => {
-    if (turn === Turn.X) {
-        return Turn.O;
+const nextPiece = (turn: Piece): Piece => {
+    if (turn === Piece.X) {
+        return Piece.O;
     } else {
-        return Turn.X;
+        return Piece.X;
     }
 };
 
+class Grid<T> {
+    width: number;
+    height: number;
+    array: (T | undefined)[];
+
+    constructor(width: number, height: number) {
+        this.width = width;
+        this.height = height;
+        this.array = [];
+    }
+
+    outOfBounds(x: number, y: number): boolean {
+        return x > this.width || x < 0 || y > this.height || y < 0;
+    }
+
+    // coordinate to index
+    i(x: number, y: number): number {
+        return (y * this.height) + x;
+    }
+
+    set(x: number, y: number, val: (T | undefined)): void {
+        if (this.outOfBounds(x, y)) {
+            throw new Error(`Out of bounds: size is ${this.width}x${this.height} tried to set to ${x}x${y}`);
+        }
+        this.array[this.i(x, y)] = val;
+    }
+
+    get(x: number, y: number): (T | undefined) {
+        if (this.outOfBounds(x, y)) {
+            throw new Error(`Out of bounds: size is ${this.width}x${this.height} tried to get from ${x}x${y}`);
+        }
+        return this.array[this.i(x, y)];
+    }
+}
+
 class SimpleScene extends Phaser.Scene {
-    turn: Turn = Turn.X;
+    turn: Piece;
+    board: Grid<undefined | Piece>
+
+    constructor(config: string | Phaser.Types.Scenes.SettingsConfig) {
+        super(config);
+
+        this.turn = Piece.X;
+        this.board = new Grid(3, 3);
+    }
 
     create(): void {
         const graphics = this.add.graphics();
@@ -73,12 +116,12 @@ class SimpleScene extends Phaser.Scene {
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
             const {x, y} = snapToBoard(pointer.x, pointer.y);
 
-            if (this.turn === Turn.X) {
+            if (this.turn === Piece.X) {
                 drawX(graphics, x, y);
             } else {
                 drawO(graphics, x, y);
             }
-            this.turn = nextTurn(this.turn);
+            this.turn = nextPiece(this.turn);
         }, this);
     }
 }
