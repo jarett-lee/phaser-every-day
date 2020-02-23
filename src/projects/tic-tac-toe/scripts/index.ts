@@ -1,20 +1,19 @@
 import Phaser from "phaser";
 
+const size = 100;
+const halfSize = Math.floor(size / 2);
+
 const drawO = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
     graphics.beginPath();
 
-    const size = 100;
-    const radius = Math.floor(size / 2);
-
-    graphics.strokeCircle(centerX, centerY, radius);
+    graphics.strokeCircle(centerX, centerY, halfSize);
 };
 
 const drawX = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
     graphics.beginPath();
 
-    const size = 100;
-    const x = centerX - Math.floor(size / 2);
-    const y = centerY - Math.floor(size / 2);
+    const x = centerX - halfSize;
+    const y = centerY - halfSize;
 
     graphics.moveTo(x, y);
     graphics.lineTo(x + size, y + size);
@@ -25,10 +24,8 @@ const drawX = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: 
 };
 
 const drawBoard = (graphics: Phaser.GameObjects.Graphics, centerX: number, centerY: number): void => {
-    const size = 100;
-
-    const x = centerX - Math.floor(size / 2) - size;
-    const y = centerY - Math.floor(size / 2) - size;
+    const x = centerX - halfSize - size;
+    const y = centerY - halfSize - size;
 
     graphics.moveTo(x, y + size);
     graphics.lineTo(x + (3 * size), y + size);
@@ -43,6 +40,13 @@ const drawBoard = (graphics: Phaser.GameObjects.Graphics, centerX: number, cente
     graphics.lineTo(x + (2 * size), y + (3 * size));
 
     graphics.strokePath();
+};
+
+const snapToBoard = (x: number, y: number): {x: number; y: number} => {
+    return {
+        x: Math.floor((x + halfSize) / size) * size,
+        y: Math.floor((y + halfSize) / size) * size,
+    };
 };
 
 enum Turn {
@@ -71,10 +75,12 @@ class SimpleScene extends Phaser.Scene {
         drawBoard(graphics, 200, 200);
 
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+            const {x, y} = snapToBoard(pointer.x, pointer.y);
+
             if (this.turn === Turn.X) {
-                drawX(graphics, pointer.x, pointer.y);
+                drawX(graphics, x, y);
             } else {
-                drawO(graphics, pointer.x, pointer.y);
+                drawO(graphics, x, y);
             }
             this.turn = nextTurn(this.turn);
         }, this);
