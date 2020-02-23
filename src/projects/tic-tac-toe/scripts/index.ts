@@ -45,7 +45,21 @@ const drawBoard = (graphics: Phaser.GameObjects.Graphics, centerX: number, cente
     graphics.strokePath();
 };
 
+enum Turn {
+    X, O
+}
+
+const nextTurn = (turn: Turn): Turn => {
+    if (turn === Turn.X) {
+        return Turn.O;
+    } else {
+        return Turn.X;
+    }
+};
+
 class SimpleScene extends Phaser.Scene {
+    turn: Turn = Turn.X;
+
     preload(): void {
         // TODO
     }
@@ -54,9 +68,16 @@ class SimpleScene extends Phaser.Scene {
         const graphics = this.add.graphics();
         graphics.lineStyle(1, 0xFFFFFF);
 
-        drawX(graphics, 100, 100);
-        drawO(graphics, 200, 200);
         drawBoard(graphics, 200, 200);
+
+        this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+            if (this.turn === Turn.X) {
+                drawX(graphics, pointer.x, pointer.y);
+            } else {
+                drawO(graphics, pointer.x, pointer.y);
+            }
+            this.turn = nextTurn(this.turn);
+        }, this);
     }
 
     update(): void {
@@ -70,8 +91,8 @@ class SimpleGame {
     constructor() {
         const config: Phaser.Types.Core.GameConfig = {
             type: Phaser.AUTO,
-            width: 800,
-            height: 600,
+            width: 400,
+            height: 400,
         };
 
         this.game = new Phaser.Game(config);
