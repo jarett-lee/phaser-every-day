@@ -19,10 +19,12 @@ module.exports = {
       impliedStrict: true
     }
   },
-  "import/resolver": "webpack",
   env: {
     browser: true,
     commonjs: true
+  },
+  settings: {
+    "import/resolver": "webpack",
   },
   rules: {
     // Variables
