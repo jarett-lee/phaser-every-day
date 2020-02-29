@@ -130,7 +130,7 @@ class SimpleScene extends Phaser.Scene {
         this.getGraphics().draw(this.board);
     }
 
-    determineWinnerIfExists(): Piece | undefined {
+    isGameOver(): boolean {
         const {board} = this;
 
         const allSamePiece = (a?: Piece, b?: Piece, c?: Piece): Piece | undefined => {
@@ -140,14 +140,21 @@ class SimpleScene extends Phaser.Scene {
         };
 
         let winner: Piece | undefined = undefined;
+        let undefinedCount = 0;
         for (let i = 0; i < 3; i += 1) {
             if (winner === undefined) winner = allSamePiece(board.get(0, i), board.get(1, i), board.get(2, i));
             if (winner === undefined) winner = allSamePiece(board.get(i, 0), board.get(i, 1), board.get(i, 2));
+
+            undefinedCount += board.get(0, i) === undefined ? 1 : 0;
+            undefinedCount += board.get(1, i) === undefined ? 1 : 0;
+            undefinedCount += board.get(2, i) === undefined ? 1 : 0;
         }
         if (winner === undefined) winner = allSamePiece(board.get(0, 0), board.get(1, 1), board.get(2, 2));
         if (winner === undefined) winner = allSamePiece(board.get(2, 0), board.get(1, 1), board.get(0, 2));
+        const winnerExists = winner !== undefined;
+        const boardFull = undefinedCount === 0;
 
-        return winner;
+        return winnerExists || boardFull;
     }
 
     create(): void {
@@ -166,8 +173,7 @@ class SimpleScene extends Phaser.Scene {
 
             graphics.draw(this.board);
             this.turn = nextPiece(this.turn);
-            console.log(this.board.array);
-            if (this.determineWinnerIfExists() !== undefined) {
+            if (this.isGameOver()) {
                 this.reset();
             }
         }, this);
