@@ -77,16 +77,7 @@ class Graphics {
     }
 }
 
-const snapToBoard = (x: number, y: number, size: number): {x: number; y: number} => {
-    const halfSize = Math.floor(size / 2);
-
-    return {
-        x: Math.floor((x + halfSize) / size) * size,
-        y: Math.floor((y + halfSize) / size) * size,
-    };
-};
-
-const snapToBoard2 = (x: number, y: number, leftX: number, topY: number, size2: number): {x: number; y: number} => {
+const snapToBoard = (x: number, y: number, leftX: number, topY: number, size2: number): {x: number; y: number} => {
     const halfSize2 = Math.floor(size2 / 2);
 
     return {
@@ -162,7 +153,7 @@ class SimpleScene extends Phaser.Scene {
         const graphics = this.getGraphics();
 
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-            const {x, y} = snapToBoard2(pointer.x, pointer.y, size, size, size);
+            const {x, y} = snapToBoard(pointer.x, pointer.y, size, size, size);
             const outOfBounds = this.board.outOfBounds(x, y);
             if (outOfBounds) return;
 
