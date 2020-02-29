@@ -151,21 +151,30 @@ class SimpleScene extends Phaser.Scene {
     create(): void {
         const {size} = this;
         const graphics = this.getGraphics();
+        let state = "play";
+        const text = this.add.text(10, 10, "");
 
         this.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-            const {x, y} = snapToBoard(pointer.x, pointer.y, size, size, size);
-            const outOfBounds = this.board.outOfBounds(x, y);
-            if (outOfBounds) return;
+            if (state === "play") {
+                const {x, y} = snapToBoard(pointer.x, pointer.y, size, size, size);
+                const outOfBounds = this.board.outOfBounds(x, y);
+                if (outOfBounds) return;
 
-            const piece = this.board.get(x, y);
-            if (piece !== undefined) return;
+                const piece = this.board.get(x, y);
+                if (piece !== undefined) return;
 
-            this.board.set(x, y, this.turn);
+                this.board.set(x, y, this.turn);
 
-            graphics.draw(this.board);
-            this.turn = nextPiece(this.turn);
-            if (this.isGameOver()) {
+                graphics.draw(this.board);
+                this.turn = nextPiece(this.turn);
+                if (this.isGameOver()) {
+                    text.setText("Click to play again");
+                    state = "done";
+                }
+            } else {
                 this.reset();
+                text.setText("");
+                state = "play";
             }
         }, this);
 
