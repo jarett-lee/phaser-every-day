@@ -35,4 +35,8 @@ export class Grid<T> {
         }
         return this.array[this.i(x, y)];
     }
+
+    clear(): void {
+        this.array.fill(undefined);
+    }
 }

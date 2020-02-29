@@ -73,6 +73,31 @@ class SimpleScene extends Phaser.Scene {
         this.board = new Grid(3, 3);
     }
 
+    reset(): void {
+        this.turn = Piece.X;
+        this.board.clear();
+    }
+
+    determineWinnerIfExists(): Piece | undefined {
+        const {board} = this;
+
+        const allSamePiece = (a?: Piece, b?: Piece, c?: Piece): Piece | undefined => {
+            const allDefined = a !== undefined && b !== undefined && c !== undefined;
+            const allEqual = a === b && b === c;
+            return allDefined && allEqual ? a : undefined;
+        };
+
+        let winner: Piece | undefined = undefined;
+        for (let i = 0; i < 3; i += 1) {
+            winner = winner === undefined ? undefined : allSamePiece(board.get(0, i), board.get(1, i), board.get(2, i));
+            winner = winner === undefined ? undefined : allSamePiece(board.get(i, 0), board.get(i, 1), board.get(i, 2));
+        }
+        winner = winner === undefined ? undefined : allSamePiece(board.get(0, 0), board.get(1, 1), board.get(2, 2));
+        winner = winner === undefined ? undefined : allSamePiece(board.get(2, 0), board.get(1, 1), board.get(0, 2));
+
+        return winner;
+    }
+
     create(): void {
         const graphics = this.add.graphics();
         graphics.lineStyle(1, 0xFFFFFF);
@@ -88,6 +113,9 @@ class SimpleScene extends Phaser.Scene {
                 drawO(graphics, x, y);
             }
             this.turn = nextPiece(this.turn);
+            if (this.determineWinnerIfExists() !== undefined) {
+                this.reset();
+            }
         }, this);
     }
 }
