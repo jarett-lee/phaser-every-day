@@ -14,12 +14,20 @@ export class Grid<T> {
     }
 
     outOfBounds(x: number, y: number): boolean {
-        return x > this.width || x < 0 || y > this.height || y < 0;
+        return x >= this.width || x < 0 || y >= this.height || y < 0;
     }
 
     // coordinate to index
     i(x: number, y: number): number {
         return (y * this.height) + x;
+    }
+
+    // index to coordinate
+    c(i: number): {x: number; y: number} {
+        return {
+            x: i % this.width,
+            y: Math.floor(i / this.width),
+        };
     }
 
     set(x: number, y: number, val: (T | undefined)): void {
@@ -38,5 +46,9 @@ export class Grid<T> {
 
     clear(): void {
         this.array.fill(undefined);
+    }
+
+    forEach(callbackfn: (value: (T | undefined), index: number, array: (T | undefined)[]) => void): void {
+        this.array.forEach(callbackfn);
     }
 }
